@@ -1,0 +1,187 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-brand-50: #eff6ff;
+  --color-brand-100: #dbeafe;
+  --color-brand-200: #bfdbfe;
+  --color-brand-300: #93c5fd;
+  --color-brand-400: #60a5fa;
+  --color-brand-500: #2563eb;
+  --color-brand-600: #1d4ed8;
+  --color-brand-700: #1e40af;
+}
+
+@layer base {
+  html {
+    font-family:
+      -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  }
+  body {
+    @apply bg-slate-100 text-slate-800 text-sm antialiased;
+  }
+  h2 {
+    @apply text-xl font-semibold text-slate-900;
+  }
+  h3 {
+    @apply text-base font-semibold text-slate-900;
+  }
+  h4 {
+    @apply text-sm font-semibold text-slate-700 mt-4 mb-1;
+  }
+  a {
+    @apply text-brand-600 hover:underline;
+  }
+  code {
+    @apply rounded bg-slate-100 px-1 py-0.5 text-[0.8em] text-slate-700;
+  }
+}
+
+@layer components {
+  /* layout */
+  .app-shell {
+    @apply flex min-h-screen;
+  }
+  .nav {
+    @apply flex w-56 shrink-0 flex-col gap-1 border-r border-slate-200 bg-white p-4;
+  }
+  .nav h1 {
+    @apply mb-3 text-sm font-bold tracking-tight text-slate-900;
+  }
+  .nav button {
+    @apply rounded-lg px-3 py-2 text-left text-sm text-slate-600 hover:bg-slate-100;
+  }
+  .nav button.active {
+    @apply bg-brand-500 text-white hover:bg-brand-500;
+  }
+  .nav .active-iter {
+    @apply mt-auto text-xs text-slate-400;
+  }
+  .content {
+    @apply mx-auto w-full max-w-6xl flex-1 p-6;
+  }
+
+  .panel {
+    @apply mb-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm;
+  }
+
+  /* tables */
+  table {
+    @apply w-full border-collapse text-sm;
+  }
+  thead th {
+    @apply border-b border-slate-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500;
+  }
+  tbody td,
+  tfoot td {
+    @apply border-b border-slate-100 px-3 py-2 align-middle;
+  }
+  tbody tr:hover {
+    @apply bg-slate-50/70;
+  }
+  td.num,
+  th.num {
+    @apply text-right tabular-nums;
+  }
+  tr.role-qa {
+    @apply bg-brand-50;
+  }
+  tr.role-qa td:first-child {
+    box-shadow: inset 3px 0 0 var(--color-brand-500);
+  }
+
+  /* buttons */
+  button.primary,
+  .btn-primary {
+    @apply inline-flex items-center rounded-lg bg-brand-500 px-3.5 py-2 text-sm font-medium text-white
+      shadow-sm transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  button.ghost,
+  .btn-ghost {
+    @apply inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm
+      text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  /* form controls */
+  input,
+  select {
+    @apply rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm text-slate-800
+      shadow-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100;
+  }
+  input[type='number'] {
+    @apply w-24 text-right;
+  }
+  input[type='checkbox'],
+  input[type='radio'] {
+    @apply h-4 w-4 accent-brand-500 shadow-none;
+  }
+  input[type='file'] {
+    @apply hidden;
+  }
+  .form-row {
+    @apply mb-2 flex flex-wrap items-center gap-2;
+  }
+  .form-row label {
+    @apply w-40 text-slate-500;
+  }
+  .field-error {
+    @apply mt-1 text-xs font-medium text-rose-600;
+  }
+
+  /* badges */
+  .badge {
+    @apply inline-flex rounded-full px-2 py-0.5 text-xs font-semibold text-white;
+  }
+  .badge.Over {
+    @apply bg-rose-600;
+  }
+  .badge.Under {
+    @apply bg-amber-500;
+  }
+  .badge.OK {
+    @apply bg-emerald-600;
+  }
+  .role-tag {
+    @apply text-[11px] font-bold tracking-wide;
+  }
+  .role-tag.QA {
+    @apply text-brand-600;
+  }
+  .role-tag.Dev {
+    @apply text-slate-400;
+  }
+
+  /* tabs */
+  .tabs {
+    @apply mb-4 flex gap-1 border-b border-slate-200;
+  }
+  .tabs button {
+    @apply -mb-px border-b-2 border-transparent px-3 py-2 text-sm text-slate-500 hover:text-slate-800;
+  }
+  .tabs button.active {
+    @apply border-brand-500 font-medium text-slate-900;
+  }
+
+  /* misc */
+  .toast {
+    @apply fixed bottom-5 right-5 z-50 max-w-sm rounded-xl bg-slate-900 px-4 py-2.5 text-sm text-white shadow-lg;
+  }
+  .toast.error {
+    @apply bg-rose-600;
+  }
+  .summary-strip {
+    @apply flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px] text-slate-600;
+  }
+  .summary-strip .k {
+    @apply mr-1 text-slate-400;
+  }
+  .filedrop {
+    @apply cursor-pointer rounded-xl border-2 border-dashed border-slate-300 p-6 text-center
+      text-slate-500 transition hover:border-brand-400 hover:bg-brand-50/50;
+  }
+  .muted {
+    @apply text-slate-500;
+  }
+  .right {
+    @apply text-right;
+  }
+}
