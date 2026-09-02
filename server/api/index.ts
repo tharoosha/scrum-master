@@ -44,7 +44,7 @@ export function createApp(services: Services): Express {
   const app = express();
   app.disable('x-powered-by');
   app.use(basicAuth());
-  app.use(express.json({ limit: '2mb' }));
+  app.use(express.json({ limit: '5mb' }));
 
   const api = express.Router();
   api.get('/health', (_req, res) => res.json({ ok: true }));

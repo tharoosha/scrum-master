@@ -410,6 +410,14 @@ Column sums and totals written as live formulas. Numbers 2dp. New test server/se
 
 ---
 
+## Post-deploy Fix - calendar upload fails on Vercel (multipart on serverless)
+**Timestamp**: 2026-09-02T19:30:00Z
+**User Input**: "calander uploads fails in hosted environment"
+**AI Response**: "Root cause: the upload used multipart/form-data + multer, which is unreliable on Vercel's Node runtime (it consumes the request stream before multer can read it, so req.file is undefined). Fixed by sending the .ics as a JSON body instead: web/src/api/client.ts uploadCalendar() now does `await file.text()` and POSTs `{ fileName, ics }` as JSON; server/api/calendars.ts drops multer and reads req.body.ics / req.body.fileName. Removed multer + @types/multer deps. Bumped express.json limit 2mb -> 5mb. Added 2 supertest cases (JSON upload succeeds + returns summary; empty ics -> 400). Verified locally: POST /api/calendars/SL with JSON body parses the event and persists. Suite 83 -> 85 passing; tsc clean; build OK. Docs updated (api-summary)."
+**Context**: OPERATIONS PHASE - calendar upload now works on Vercel (JSON, no multipart)
+
+---
+
 ## Build and Test - Approval Received → Operations
 **Timestamp**: 2026-09-01T11:20:00Z
 **User Input**: "approve & continue"

@@ -19,6 +19,28 @@ describe('HTTP API', () => {
     expect(res.body).toHaveLength(11);
   });
 
+  it('uploads a holiday calendar as a JSON body', async () => {
+    const ics =
+      'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//x//x//EN\r\n' +
+      'BEGIN:VEVENT\r\nUID:1\r\nSUMMARY:Poya\r\nDTSTART;VALUE=DATE:20260819\r\nDTEND;VALUE=DATE:20260820\r\nEND:VEVENT\r\n' +
+      'END:VCALENDAR';
+    const res = await request(a)
+      .post('/api/calendars/SL')
+      .send({ fileName: 'sl-2026.ics', ics });
+    expect(res.status).toBe(200);
+    expect(res.body.locationGroup).toBe('SL');
+    expect(res.body.eventCount).toBe(1);
+    expect(res.body.sourceFileName).toBe('sl-2026.ics');
+
+    const list = await request(a).get('/api/calendars');
+    expect(list.body.find((c: { locationGroup: string }) => c.locationGroup === 'SL').eventCount).toBe(1);
+  });
+
+  it('rejects an empty calendar upload', async () => {
+    const res = await request(a).post('/api/calendars/SL').send({ fileName: 'x.ics', ics: '' });
+    expect(res.status).toBe(400);
+  });
+
   it('validation errors map to 400', async () => {
     const res = await request(a).post('/api/members').send({ name: '', role: 'Dev' });
     expect(res.status).toBe(400);

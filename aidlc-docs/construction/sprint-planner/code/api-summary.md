@@ -16,7 +16,7 @@ Express, JSON, mounted under `/api`. Errors → status codes via `errorMiddlewar
 | `POST /api/members/:id/scrum-master` | `roster.setScrumMaster` |
 | `GET /api/settings` · `PUT /api/settings` | `settings.getSettings` / `updateSettings` |
 | `GET /api/calendars` | `calendars.getSummaries` |
-| `POST /api/calendars/:location` (multipart `file`) | `calendars.uploadCalendar` |
+| `POST /api/calendars/:location` (JSON `{ fileName, ics }`) | `calendars.uploadCalendar` — the `.ics` text is sent as a JSON string, not multipart (multipart is unreliable on serverless) |
 | `GET /api/iterations` | `iterations.listIterations` |
 | `POST /api/iterations` | `iterations.createIteration` |
 | `GET /api/iterations/:id` | `iterations.getIteration` |

@@ -57,12 +57,11 @@ export const api = {
   // calendars
   getCalendars: () => req<CalendarSummary[]>('/calendars'),
   uploadCalendar: async (location: 'SL' | 'MY', file: File) => {
-    const fd = new FormData();
-    fd.append('file', file);
-    const res = await fetch(`${BASE}/calendars/${location}`, { method: 'POST', body: fd });
-    const body = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error((body as { message?: string }).message ?? 'Upload failed');
-    return body as CalendarSummary;
+    const ics = await file.text();
+    return req<CalendarSummary>(`/calendars/${location}`, {
+      method: 'POST',
+      body: JSON.stringify({ fileName: file.name, ics }),
+    });
   },
 
   // iterations
