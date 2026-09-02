@@ -12,7 +12,7 @@ import type {
   NewIteration,
   ParticipantPatch,
   PersonBreakdown,
-} from '@shared/types.js';
+} from '../../shared/types.js';
 import type { Repository } from '../repository/index.js';
 import { NotFoundError, assert } from '../errors.js';
 import { personBreakdown, pools } from '../calc/capacityEngine.js';

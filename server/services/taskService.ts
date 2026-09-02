@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import type { NewTask, Task, TaskAssignment, TaskPatch } from '@shared/types.js';
+import type { NewTask, Task, TaskAssignment, TaskPatch } from '../../shared/types.js';
 import type { Repository } from '../repository/index.js';
 import { NotFoundError, assert } from '../errors.js';
 import type { IterationService } from './iterationService.js';

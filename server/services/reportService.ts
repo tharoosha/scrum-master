@@ -1,4 +1,4 @@
-import type { ReportRow } from '@shared/types.js';
+import type { ReportRow } from '../../shared/types.js';
 import type { Repository } from '../repository/index.js';
 import type { IterationService } from './iterationService.js';
 import type { AllocationService } from './allocationService.js';

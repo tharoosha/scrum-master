@@ -3,7 +3,7 @@ import type {
   HolidayCalendar,
   HolidayEvent,
   LocationGroup,
-} from '@shared/types.js';
+} from '../../shared/types.js';
 import type { Repository } from '../repository/index.js';
 import { ValidationError, assert } from '../errors.js';
 import { eachDate, isWeekday } from '../calc/workingDays.js';

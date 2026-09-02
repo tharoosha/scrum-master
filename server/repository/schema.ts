@@ -6,8 +6,8 @@ import type {
   IterationParticipant,
   ExtraAssignment,
   Task,
-} from '@shared/types.js';
-import { DEFAULT_SETTINGS } from '@shared/constants.js';
+} from '../../shared/types.js';
+import { DEFAULT_SETTINGS } from '../../shared/constants.js';
 
 /**
  * In-memory aggregate the services work against. On disk it is split

@@ -19,7 +19,7 @@
 import { describe, it, expect } from 'vitest';
 import { personBreakdown, pools } from '../server/calc/capacityEngine.js';
 import type { CapacityInput } from '../server/calc/capacityEngine.js';
-import { DEFAULT_SETTINGS } from '@shared/constants.js';
+import { DEFAULT_SETTINGS } from '../shared/constants.js';
 
 const WINDOW = { startDate: '2026-08-17', endDate: '2026-09-04' }; // 15 weekdays
 const CAL_WD = 15;

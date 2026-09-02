@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { buildProductionServices } from './container.js';
 import { createApp } from './api/index.js';
-import { SERVER_PORT } from '@shared/constants.js';
+import { SERVER_PORT } from '../shared/constants.js';
 
 // Load .env (Jira, DB, auth) before building services. On Vercel the env comes from
 // the dashboard, so there's no .env file and this is skipped.

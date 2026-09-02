@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { personBreakdown, pools, totalBufferPercent, bufferSplitPercent } from './capacityEngine.js';
 import type { CapacityInput } from './capacityEngine.js';
-import { DEFAULT_SETTINGS } from '@shared/constants.js';
+import { DEFAULT_SETTINGS } from '../../shared/constants.js';
 
 const S = DEFAULT_SETTINGS;
 

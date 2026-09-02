@@ -5,7 +5,7 @@ import type {
   JiraSprint,
   JiraSprintImport,
   JiraStatus,
-} from '@shared/types.js';
+} from '../../shared/types.js';
 import { NotFoundError, ValidationError, AppError } from '../errors.js';
 
 const KEY_RE = /^[A-Z][A-Z0-9]+-\d+$/;

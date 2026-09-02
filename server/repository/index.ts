@@ -2,6 +2,17 @@ import { DbData, emptyDb } from './schema.js';
 import { FileStore } from './fileStore.js';
 import { MemoryStore, type Store } from './store.js';
 
+/** A store that only reports a configuration problem (never crashes the function at startup). */
+class MisconfiguredStore implements Store {
+  constructor(private readonly message: string) {}
+  load(): Promise<DbData> {
+    return Promise.reject(new Error(this.message));
+  }
+  save(): Promise<void> {
+    return Promise.reject(new Error(this.message));
+  }
+}
+
 /**
  * Repository — the in-memory `DbData` the services read and mutate, backed by a `Store`.
  *
@@ -51,7 +62,11 @@ export class Repository {
 
 let singleton: Repository | null = null;
 
-/** Pick the store from the environment: Postgres when `POSTGRES_URL` is set, else local files. */
+/**
+ * Pick the store from the environment: Neon Postgres when a connection string is set,
+ * otherwise the local file store. Never throws here — a misconfiguration surfaces as a
+ * clean error on the first request (so `/api/health` still works and the message is visible).
+ */
 export async function getRepository(): Promise<Repository> {
   if (!singleton) {
     let store: Store;
@@ -59,15 +74,14 @@ export async function getRepository(): Promise<Repository> {
       const { PostgresStore } = await import('./postgresStore.js');
       store = new PostgresStore();
     } else if (process.env.VERCEL) {
-      throw new Error(
-        'Running on Vercel without a database. Connect a Neon Postgres store to the project ' +
-          '(Storage → Create Database → Neon) so DATABASE_URL is set. See DEPLOY.md.',
+      store = new MisconfiguredStore(
+        'No database connected. In the Vercel project: Storage → Create Database → Neon, ' +
+          'connect it (sets DATABASE_URL), then redeploy. See DEPLOY.md.',
       );
     } else {
       store = new FileStore(FileStore.defaultDir());
     }
     singleton = new Repository(store);
-    await singleton.load();
   }
   return singleton;
 }

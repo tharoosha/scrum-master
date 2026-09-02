@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import type { NewTeamMember, Role, TeamMember } from '@shared/types.js';
+import type { NewTeamMember, Role, TeamMember } from '../../shared/types.js';
 import type { Repository } from '../repository/index.js';
 import { NotFoundError, assert } from '../errors.js';
 

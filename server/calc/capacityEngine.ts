@@ -7,7 +7,7 @@ import type {
   Role,
   PersonBreakdown,
   BufferConfig,
-} from '@shared/types.js';
+} from '../../shared/types.js';
 import { grossHours, netWorkingDays, personWorkingDays } from './workingDays.js';
 
 export interface CapacityInput {

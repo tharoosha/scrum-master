@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 import { AppError, ValidationError } from '../errors.js';
-import type { ApiError } from '@shared/types.js';
+import type { ApiError } from '../../shared/types.js';
 
 /** Read a required route param (typed as string, not string | undefined). */
 export function param(req: Request, name: string): string {

@@ -3,7 +3,7 @@ import type {
   CapexOpexSummary,
   PersonAllocation,
   AllocationStatus,
-} from '@shared/types.js';
+} from '../../shared/types.js';
 import type { Repository } from '../repository/index.js';
 import { bufferSplitPercent } from '../calc/capacityEngine.js';
 import type { IterationService } from './iterationService.js';

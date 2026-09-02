@@ -98,8 +98,8 @@ load seeds the 11-person roster (Vihidun as Scrum Master).
 - **Concurrency**: the whole state is one row; simultaneous edits are last-write-wins. Fine for
   a few users; don't have two people editing the same iteration at the exact same second.
 - **Backup**: `SELECT data FROM planner_state WHERE id = 1;` in Neon gives you the full JSON.
-- **Function timeout**: `vercel.json` sets `maxDuration: 30`s. Importing a very large Jira sprint
-  could approach that on the free plan (10s) — split the sprint or bump the plan if it times out.
+- **Function timeout**: `vercel.json` sets `maxDuration: 10`s (Hobby-safe). Importing a very
+  large Jira sprint could approach that — split the sprint or raise it on a paid plan.
 - **Moving local data up**: `data/planner.json` + `data/iterations/*.json` + `data/calendars/*.ics`
   hold your local data. To seed the hosted DB with it, combine them into the `DbData` shape and
   `INSERT ... INTO planner_state (id, data) VALUES (1, '<json>')`. Easiest is to just re-enter /

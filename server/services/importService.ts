@@ -1,4 +1,4 @@
-import type { ImportJiraRequest, IterationDetail, JiraSprint } from '@shared/types.js';
+import type { ImportJiraRequest, IterationDetail, JiraSprint } from '../../shared/types.js';
 import { ConflictError, ValidationError, assert } from '../errors.js';
 import type { IterationService } from './iterationService.js';
 import type { TaskService } from './taskService.js';

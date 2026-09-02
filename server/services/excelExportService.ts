@@ -1,5 +1,5 @@
 import ExcelJS from 'exceljs';
-import type { ExpenseCategory, Role } from '@shared/types.js';
+import type { ExpenseCategory, Role } from '../../shared/types.js';
 import type { Repository } from '../repository/index.js';
 import { round2 } from '../calc/capacityEngine.js';
 import { netWorkingDays } from '../calc/workingDays.js';

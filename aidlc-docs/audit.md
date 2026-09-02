@@ -426,6 +426,14 @@ Column sums and totals written as live formulas. Numbers 2dp. New test server/se
 
 ---
 
+## Post-deploy Fix #3 - ERR_MODULE_NOT_FOUND '@shared/constants.js' on Vercel (every /api route)
+**Timestamp**: 2026-09-02T20:45:00Z
+**User Input**: Vercel log — "Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@shared/constants.js' imported from /var/task/server/repository/schema.js"
+**AI Response**: "@vercel/node compiled the TS to JS but did NOT rewrite the `@shared/*` tsconfig path alias, so at runtime Node couldn't resolve it -> every /api route crashed (FUNCTION_INVOCATION_FAILED). Fixed by replacing the `@shared/*` alias with relative imports (`../../shared/...`) across all of server/ and test/ (18 files). The alias is kept only for web/ (Vite + vitest resolve it; that code is bundled, not deployed as raw files). Also made init failures legible: getRepository() no longer throws eagerly — on Vercel with no DB it installs a MisconfiguredStore that rejects load()/save() with an actionable message (so /api/health still works and the frontend shows the error); api/index.ts wraps the handler to return a JSON 500 instead of Vercel's generic crash page. vercel.json maxDuration 30 -> 10 (Hobby-safe). Suite 85/85; tsc clean; local server verified."
+**Context**: OPERATIONS PHASE - serverless module resolution fixed; every /api route should work once a DB is connected
+
+---
+
 ## Build and Test - Approval Received → Operations
 **Timestamp**: 2026-09-01T11:20:00Z
 **User Input**: "approve & continue"

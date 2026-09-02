@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import type { TeamMember, Role, LocationGroup } from '@shared/types.js';
+import type { TeamMember, Role, LocationGroup } from '../../shared/types.js';
 
 interface SeedRow {
   name: string;

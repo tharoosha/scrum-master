@@ -1,6 +1,6 @@
-import type { Settings } from '@shared/types.js';
+import type { Settings } from '../../shared/types.js';
 import type { Repository } from '../repository/index.js';
-import { EDITABLE_SETTINGS_KEYS } from '@shared/constants.js';
+import { EDITABLE_SETTINGS_KEYS } from '../../shared/constants.js';
 import { assert } from '../errors.js';
 
 /** SettingsService — read the global settings, update the editable subset. */

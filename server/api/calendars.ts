@@ -2,7 +2,7 @@ import { Router } from 'express';
 import type { Services } from '../container.js';
 import { param, wrap } from './errorMiddleware.js';
 import { ValidationError } from '../errors.js';
-import type { LocationGroup } from '@shared/types.js';
+import type { LocationGroup } from '../../shared/types.js';
 
 /**
  * Calendars. The .ics is sent as a JSON body ({ fileName, ics }) rather than
