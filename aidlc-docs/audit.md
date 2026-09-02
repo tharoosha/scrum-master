@@ -418,6 +418,14 @@ Column sums and totals written as live formulas. Numbers 2dp. New test server/se
 
 ---
 
+## Post-deploy Fix #2 - FUNCTION_INVOCATION_FAILED on /api/calendars/SL
+**Timestamp**: 2026-09-02T20:15:00Z
+**User Input**: "A server error has occurred / FUNCTION_INVOCATION_FAILED ... /api/calendars/SL"
+**AI Response**: "Hard function crash (not a 4xx). Prime cause: node-ical (pulls in moment-timezone + rrule) doesn't bundle cleanly for @vercel/node — a minimal .ics parsed fine locally but a real government feed with VTIMEZONE/TZID/folded lines crashes the bundled function. Replaced node-ical with a ~60-line dependency-free .ics parser in calendarService.ts: RFC5545 line-unfolding, all-day VEVENTs only (8-digit DTSTART), skip RRULE + timed events, ignore VTIMEZONE/X-props, multi-day expansion, text unescaping. Removed the node-ical dependency. Verified against a realistic feed (VTIMEZONE block, X-WR-TIMEZONE, folded SUMMARY, timed event, RRULE event) -> only the all-day holidays extracted. Also hardened: PostgresStore now lazy-creates the neon() client with a clear 'DATABASE_URL not set' error instead of throwing at construction; getRepository() throws an actionable error if running on Vercel (process.env.VERCEL) with no DB connected (instead of a cryptic EROFS crash from FileStore's mkdirSync on the read-only fs). Suite still 85/85; tsc clean."
+**Context**: OPERATIONS PHASE - calendar parsing is now serverless-safe; DB-misconfig errors are legible
+
+---
+
 ## Build and Test - Approval Received → Operations
 **Timestamp**: 2026-09-01T11:20:00Z
 **User Input**: "approve & continue"

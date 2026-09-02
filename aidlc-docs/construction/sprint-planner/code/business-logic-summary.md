@@ -13,7 +13,7 @@ Both are side-effect free and unit-tested directly (`*.test.ts` next to each).
 
 | File | Responsibility |
 |---|---|
-| `calendarService.ts` | `.ics` parse (all-day only, expand multi-day, skip RRULE/timed), store/replace per location, `holidayDatesInRange` |
+| `calendarService.ts` | dependency-free `.ics` parser (line-unfolding; all-day VEVENTs only, expand multi-day, skip RRULE/timed; ignores VTIMEZONE/X-props), store/replace per location, `holidayDatesInRange`. (No `node-ical` — it doesn't bundle cleanly for serverless.) |
 | `rosterService.ts` | master member CRUD, single-Scrum-Master invariant, seed |
 | `settingsService.ts` | read settings, update the editable subset (validated) |
 | `iterationService.ts` | iteration CRUD, participant copy on create, per-participant overrides (leave 0.5 steps, capacity %, add'l buffer, SM move, included), extra-assignment lifecycle (SM Activity auto, MAUI Review, Common Automation), `computeCapacity`, cascade delete |

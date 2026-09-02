@@ -1,4 +1,4 @@
-import { neon } from '@neondatabase/serverless';
+import { neon, type NeonQueryFunction } from '@neondatabase/serverless';
 import { DbData, DB_VERSION, emptyDb } from './schema.js';
 import { withSeed, type Store } from './store.js';
 
@@ -11,10 +11,21 @@ import { withSeed, type Store } from './store.js';
  * `DATABASE_URL` (and `POSTGRES_URL`); either is picked up here.
  */
 export class PostgresStore implements Store {
-  private readonly sql = neon(
-    process.env.DATABASE_URL ?? process.env.POSTGRES_URL ?? '',
-  );
+  private _sql: NeonQueryFunction<false, false> | null = null;
   private schemaReady = false;
+
+  private get sql(): NeonQueryFunction<false, false> {
+    if (!this._sql) {
+      const url = process.env.DATABASE_URL ?? process.env.POSTGRES_URL;
+      if (!url) {
+        throw new Error(
+          'DATABASE_URL is not set. Connect a Neon Postgres database to the project (see DEPLOY.md).',
+        );
+      }
+      this._sql = neon(url);
+    }
+    return this._sql;
+  }
 
   private async ensureSchema(): Promise<void> {
     if (this.schemaReady) return;

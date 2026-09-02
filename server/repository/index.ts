@@ -58,6 +58,11 @@ export async function getRepository(): Promise<Repository> {
     if (process.env.DATABASE_URL ?? process.env.POSTGRES_URL) {
       const { PostgresStore } = await import('./postgresStore.js');
       store = new PostgresStore();
+    } else if (process.env.VERCEL) {
+      throw new Error(
+        'Running on Vercel without a database. Connect a Neon Postgres store to the project ' +
+          '(Storage → Create Database → Neon) so DATABASE_URL is set. See DEPLOY.md.',
+      );
     } else {
       store = new FileStore(FileStore.defaultDir());
     }

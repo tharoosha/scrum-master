@@ -1,4 +1,3 @@
-import ical from 'node-ical';
 import type {
   CalendarSummary,
   HolidayCalendar,
@@ -9,15 +8,34 @@ import type { Repository } from '../repository/index.js';
 import { ValidationError, assert } from '../errors.js';
 import { eachDate, isWeekday } from '../calc/workingDays.js';
 
-/**
- * node-ical represents all-day (VALUE=DATE) events as a Date at LOCAL midnight.
- * Format from local components so we don't shift a day across the UTC boundary.
- */
-function localDateOnly(d: Date): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
+/** `20260819` -> `2026-08-19`; `20260819T090000Z` -> null (a date-time, not a date). */
+function icsDateOnly(value: string): string | null {
+  const m = /^(\d{4})(\d{2})(\d{2})$/.exec(value.trim());
+  return m ? `${m[1]}-${m[2]}-${m[3]}` : null;
+}
+
+/** step an ISO date back one day (DTEND is exclusive for all-day events) */
+function prevDay(iso: string): string {
+  const d = new Date(iso + 'T00:00:00Z');
+  d.setUTCDate(d.getUTCDate() - 1);
+  return d.toISOString().slice(0, 10);
+}
+
+/** RFC 5545 line unfolding: a CRLF followed by a space or tab continues the previous line. */
+function unfold(text: string): string[] {
+  return text
+    .replace(/\r\n/g, '\n')
+    .replace(/\n[ \t]/g, '')
+    .split('\n');
+}
+
+function unescapeText(s: string): string {
+  return s
+    .replace(/\\n/gi, ' ')
+    .replace(/\\,/g, ',')
+    .replace(/\\;/g, ';')
+    .replace(/\\\\/g, '\\')
+    .trim();
 }
 
 /**
@@ -28,49 +46,66 @@ export class CalendarService {
   constructor(private readonly repo: Repository) {}
 
   /**
-   * Parse an iCalendar string to all-day holiday dates.
-   * - all-day events only (timed events skipped)
-   * - recurring events (RRULE) skipped
-   * - multi-day spans expanded to each individual date
+   * Minimal, dependency-free iCalendar parser for holiday feeds:
+   *  - all-day VEVENTs only (DTSTART with an 8-digit date); timed events skipped
+   *  - recurring events (RRULE) skipped
+   *  - multi-day spans expanded to each individual date
+   * (A hand-rolled parser is used instead of a library so it bundles cleanly for serverless.)
    */
   static parseIcs(icsText: string): HolidayEvent[] {
-    let parsed: Record<string, ical.CalendarComponent>;
-    try {
-      parsed = ical.sync.parseICS(icsText);
-    } catch {
+    const lines = unfold(icsText);
+    if (!lines.some((l) => l.toUpperCase().startsWith('BEGIN:VCALENDAR'))) {
       throw new ValidationError('File is not valid iCalendar (.ics) data');
     }
 
-    const events = Object.values(parsed).filter(
-      (c): c is ical.VEvent => (c as ical.VEvent).type === 'VEVENT',
-    );
-    if (events.length === 0) {
-      throw new ValidationError('No calendar events found in the file');
-    }
-
     const out: HolidayEvent[] = [];
-    for (const ev of events) {
-      if (ev.rrule) continue; // BR-C2: skip recurring
-      const isAllDay =
-        (ev.datetype && ev.datetype === 'date') ||
-        (ev.start as Date & { dateOnly?: boolean })?.dateOnly === true;
-      if (!isAllDay) continue; // BR-C2: skip timed
+    let inEvent = false;
+    let cur: { start?: string; end?: string; summary?: string; recurring?: boolean } = {};
 
-      const startIso = localDateOnly(new Date(ev.start));
-      // DTEND for all-day events is exclusive; step back one day for the inclusive span.
-      const endExclusive = ev.end ? new Date(ev.end) : new Date(ev.start);
-      const endInclusive = new Date(endExclusive.getTime() - 86_400_000);
-      const endIso =
-        endInclusive.getTime() >= new Date(ev.start).getTime()
-          ? localDateOnly(endInclusive)
-          : startIso;
-
-      for (const d of eachDate(startIso, endIso)) {
-        out.push({ date: d, summary: String(ev.summary ?? 'Holiday') });
+    const flush = () => {
+      if (cur.start) {
+        const endIso = cur.end ? prevDay(cur.end) : cur.start;
+        const finalEnd = endIso < cur.start ? cur.start : endIso;
+        for (const d of eachDate(cur.start, finalEnd)) {
+          out.push({ date: d, summary: cur.summary || 'Holiday' });
+        }
       }
+      cur = {};
+    };
+
+    for (const raw of lines) {
+      const line = raw.trim();
+      const upper = line.toUpperCase();
+      if (upper === 'BEGIN:VEVENT') {
+        inEvent = true;
+        cur = {};
+        continue;
+      }
+      if (upper === 'END:VEVENT') {
+        if (inEvent && !cur.recurring) flush();
+        else cur = {};
+        inEvent = false;
+        continue;
+      }
+      if (!inEvent) continue;
+
+      const colon = line.indexOf(':');
+      if (colon < 0) continue;
+      const name = upper.slice(0, colon).split(';')[0];
+      const value = line.slice(colon + 1);
+
+      if (name === 'RRULE') cur.recurring = true;
+      else if (name === 'DTSTART') cur.start = icsDateOnly(value) ?? undefined;
+      else if (name === 'DTEND') cur.end = icsDateOnly(value) ?? undefined;
+      else if (name === 'SUMMARY') cur.summary = unescapeText(value);
     }
 
-    // dedupe by date, keep first summary
+    if (out.length === 0) {
+      throw new ValidationError(
+        'No all-day events found in the file (holiday calendars use all-day dates)',
+      );
+    }
+
     const byDate = new Map<string, HolidayEvent>();
     for (const e of out) if (!byDate.has(e.date)) byDate.set(e.date, e);
     return [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date));
